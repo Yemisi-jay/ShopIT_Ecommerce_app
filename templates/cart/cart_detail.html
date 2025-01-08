@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Your Cart</h2>
+<ul>
+    {% for item in cart_items %}
+    <li>
+        {{ item.product.name }} - #{{ item.product.price}} * {{ item.quantity }} 
+        <form method="POST" action="{% url 'increase-quantity' item.id %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit">+</button>
+        </form>
+        <form method="POST" action="{% url 'decrease-cart-item' item.id %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit">-</button>
+        </form>
+        <form method="POST" action="{% url 'remove-from-cart' item.id %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit">Remove</button>
+        </form>
+    </li>
+    {% endfor %}
+</ul>
+<a href="{% url 'product_list' %}">Continue Shopping</a>
+    <h3>Total Price: #{{ total_cost }}</h3>
+    <a>Proceed to Checkout</a>
+{% endblock %}

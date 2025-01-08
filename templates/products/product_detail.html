@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Products details</h1>
+    
+    <p>{{ product.name }}</p>
+    <p>{{ product.description }}</p>
+    <p>Price: ${{ product.price }}</p>
+    
+    <form action="{% url 'add-to-cart' product.id %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Add to cart</button>
+    </form>
+    
+    <h3>Recommended Products</h3>
+    {% for recommended_product in recommended_products %}
+    <div>
+        <h4>{{ recommended_product.name }}</h4>
+        <p>{{ recommended_product.price }}</p>
+    </div>
+    {% endfor %}
+    
+{% endblock %}

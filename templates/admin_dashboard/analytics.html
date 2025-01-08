@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <h1>Admin Analytics Dashboard</h1>
+    <h3>Summary</h3>
+    <p><strong>Total Users:</strong>{{ total_users }}</p>
+    <p><strong>Total Products:</strong>{{ total_products }}</p>
+    <p><strong>Total Orders:</strong>{{ total_orders }}</p>
+    <p><strong>Total Revenue:</strong>{{ total_revenue|floatformat:2 }}</p>
+    
+    <a href="{% url 'admin_dashboard:manage_products' %}">Manage Products</a>
+{% endblock %}
