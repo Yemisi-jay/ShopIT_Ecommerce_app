@@ -23,5 +23,5 @@
 </ul>
 <a href="{% url 'product_list' %}">Continue Shopping</a>
     <h3>Total Price: #{{ total_cost }}</h3>
-    <a>Proceed to Checkout</a>
+    <a href="{% url 'checkout' %}">Proceed to Checkout</a>
 {% endblock %}

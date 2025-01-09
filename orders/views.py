@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Sum, F
 from django.views.generic import View, DetailView
 from django.shortcuts import redirect, render
 from .models import Order, OrderItem, Payment
@@ -42,38 +43,63 @@ class OrderDetailView(DetailView):
     context_object_name = 'order'
 
 
+class OrdersView(LoginRequiredMixin, View):
+    def get(self, request):
+        orders = Order.objects.filter(user=request.user).order_by('-created_at')
+        return render(request, 'orders/order_list.html', {'orders': orders})
+
+
 class CheckoutView(LoginRequiredMixin, View):
     def get(self, request):
-        cart_items = request.session.get('cart', {})
-        cart_products = []
-        total_price = 0
+        if request.user.is_authenticated:
+            # Get or create user-based cart
+            cart, created = Cart.objects.get_or_create(user=request.user)
+        else:
+            # Get or create session-based cart
+            cart_id = request.session.get('cart_id')
+            if cart_id:
+                cart = Cart.objects.filter(id=cart_id).first()
+            else:
+                cart = None  # No cart for guests
 
-        for product_id, quantity in cart_items.items():
-            product = Product.objects.get(id=product_id)
-            total_price += product.price * quantity
-            cart_products.append('product')
+        if not cart or not cart.items.exists():
+            messages.error(request, "Your cart is empty!")
+            return redirect('cart_detail')
+
+        cart_items = cart.items.all()
+        total_price = cart.items.aggregate(
+            total_price=Sum(F('quantity') * F('product__price'))
+        )['total_price'] or 0.0
 
         form = PaymentForm()
-
         context = {
             'cart_items': cart_items,
             'total_price': total_price,
             'form': form,
         }
+        print("Cart Items in CheckoutView Context:", cart_items)
+        print("Cart Items Passed to Templates:", cart_items)
+
         return render(request, 'orders/checkout.html', context)
 
     def post(self, request):
-        cart_items = request.session.get('cart', {})
-        if not cart_items:
-            messages.error(request, 'Your cart is empty!')
-            return redirect('checkout')
+        if request.user.is_authenticated:
+            cart = Cart.objects.filter(user=request.user).first()
+        else:
+            cart_id = request.session.get('cart_id')
+            cart = Cart.objects.filter(id=cart_id).first() if cart_id else None
 
+        if not cart or not cart.items.exists():
+            messages.error(request, "Your cart is empty!")
+            return redirect('cart_detail')
+
+        # Handle payment form
         form = PaymentForm(request.POST)
         if form.is_valid():
-            total_price = sum(
-                Product.objects.get(id=int(product_id)).price * quantity
-                for product_id, quantity in cart_items.items()
-            )
+            # Mimic payment processing
+            total_price = cart.items.aggregate(
+                total_price=Sum(F('quantity') * F('product__price'))
+            )['total_price'] or 0.0
 
             payment = Payment.objects.create(
                 user=request.user,
@@ -81,27 +107,27 @@ class CheckoutView(LoginRequiredMixin, View):
                 status='Completed'
             )
 
-            # create an Order
+            # Create an order
             order = Order.objects.create(
                 user=request.user,
                 total_price=total_price,
                 payment=payment
             )
 
-            # save order items
-            for product_id, quantity in cart_items.items():
-                product = Product.objects.get(id=product_id)
+            # Create order items
+            for item in cart.items.all():
                 OrderItem.objects.create(
                     order=order,
-                    product=product,
-                    quantity=quantity,
-                    price=product.price * quantity
+                    product=item.product,
+                    quantity=item.quantity,
+                    price=item.product.price * item.quantity
                 )
 
-                # Clear the cart
-                request.session['cart'] ={}
-                messages.success(request, 'Your order has been placed successfully!')
-                return redirect('orders')
-            else:
-                messages.error(request, 'Invalid card details. Please try again!')
-                return redirect('checkout')
+            # Clear the cart
+            cart.items.all().delete()
+            messages.success(request, "Your order has been placed successfully!")
+            return redirect('orders')  # Redirect to the orders page
+
+        else:
+            messages.error(request, "Invalid payment details. Please try again.")
+            return redirect('checkout')

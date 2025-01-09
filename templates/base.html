@@ -16,6 +16,8 @@
 </header>
 <main>
     {% block content %}
+        <a href="{% url 'checkout' %}">Checkout</a>
+        <a href="{% url 'orders' %}">Orders</a>
     {% endblock %}
 </main>
 <footer>
