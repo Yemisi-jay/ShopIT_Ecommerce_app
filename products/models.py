@@ -1,4 +1,5 @@
 from django.db import models
+from PIL import Image
 
 
 class Category(models.Model):
@@ -18,3 +19,15 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        # Call the parent class's save method
+        super().save(*args, **kwargs)
+
+        # Resize the image if it exists
+        if self.image:
+            img = Image.open(self.image.path)
+            if img.height > 500 or img.width > 500:
+                output_size = (500, 500)
+                img.thumbnail(output_size)
+                img.save(self.image.path)

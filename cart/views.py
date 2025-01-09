@@ -4,8 +4,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from .models import Cart, CartItem
 from products.models import Product
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
 from django.db.models import F, Sum
 
 
@@ -89,3 +87,4 @@ class DecreaseCartItemView(View):
         else:
             cart_item.delete()
         return redirect('cart_detail')
+

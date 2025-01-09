@@ -62,7 +62,7 @@ class CustomLoginView(LoginView):
     #     return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('home')
+        return reverse_lazy('product_list')
 
 
 # class HomeView(TemplateView):
