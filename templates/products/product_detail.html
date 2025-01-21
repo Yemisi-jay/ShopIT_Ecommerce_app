@@ -6,7 +6,7 @@
     <img src="{{ product.image.url }}" alt="{{ product.name }}" width="300" height="300">
     <p>{{ product.name }}</p>
     <p>{{ product.description }}</p>
-    <p>Price: ${{ product.price }}</p>
+    <p>Price: #{{ product.price }}</p>
     
     <form action="{% url 'add-to-cart' product.id %}" method="post">
     {% csrf_token %}
@@ -16,6 +16,7 @@
     <h3>Recommended Products</h3>
     {% for recommended_product in recommended_products %}
     <div>
+        <a href="{% url 'product-detail' recommended_product.id %}">
         <h4>{{ recommended_product.name }}</h4>
         <p>{{ recommended_product.price }}</p>
     </div>

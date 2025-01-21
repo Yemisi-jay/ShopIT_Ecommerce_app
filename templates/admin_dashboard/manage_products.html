@@ -31,7 +31,7 @@
                 <td>{{ product.id }}</td>
                 <td><img src="{{ product.image.url }}" alt="{{ product.name }}" width="50"></td>
                 <td>{{ product.name }}</td>
-                <td>${{ product.price }}</td>
+                <td>#{{ product.price }}</td>
                 <td>{{ product.stock }}</td>
                 <td>
                     <a href="{% url 'admin_dashboard:edit_product' product.id %}" class="btn btn-warning btn-sm">Edit</a>

@@ -67,7 +67,7 @@ class UserInformationView(LoginRequiredMixin, TemplateView):
 
 class ProfileEditView(LoginRequiredMixin, UpdateView):
     model = Profile
-    fields = ['address', 'phone_number', 'city', 'state', 'country']
+    fields = ['address', 'phone_number', 'city', 'state', 'country', 'zip_code']
     template_name = 'accounts/edit_profile.html'
 
     def get_object(self, queryset=None):
