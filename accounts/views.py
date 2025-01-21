@@ -74,5 +74,7 @@ class ProfileEditView(LoginRequiredMixin, UpdateView):
         profile, created = Profile.objects.get_or_create(user=self.request.user)
         return profile
 
-    def get_success_url(self):
+    def form_valid(self, form):
+        form.save()
         messages.success(self.request, "Profile updated successfully")
+        return redirect('checkout')
