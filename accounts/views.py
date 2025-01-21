@@ -64,13 +64,15 @@ class UserInformationView(LoginRequiredMixin, TemplateView):
             messages.error(self.request, "Please correct the error below.")
             return self.render_to_response(self.get_context_data())
 
+
 class ProfileEditView(LoginRequiredMixin, UpdateView):
     model = Profile
     fields = ['address', 'phone_number']
-    template_name = 'edit_profile.html'
+    template_name = 'accounts/edit_profile.html'
 
     def get_object(self, queryset=None):
-        return self.request.user.profile
+        profile, created = Profile.objects.get_or_create(user=self.request.user)
+        return profile
 
     def get_success_url(self):
         messages.success(self.request, "Profile updated successfully")
