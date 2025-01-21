@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render, redirect
-from django.views.generic import TemplateView
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.generic import TemplateView, DetailView
 
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, UserForm, ProfileForm
 from django.contrib.auth.views import LoginView, LogoutView
@@ -67,7 +67,7 @@ class UserInformationView(LoginRequiredMixin, TemplateView):
 
 class ProfileEditView(LoginRequiredMixin, UpdateView):
     model = Profile
-    fields = ['address', 'phone_number']
+    fields = ['address', 'phone_number', 'city', 'state', 'country']
     template_name = 'accounts/edit_profile.html'
 
     def get_object(self, queryset=None):
@@ -78,3 +78,12 @@ class ProfileEditView(LoginRequiredMixin, UpdateView):
         form.save()
         messages.success(self.request, "Profile updated successfully")
         return redirect('checkout')
+
+
+class ProfileView(DetailView):
+    model = Profile
+    template_name = 'accounts/profile.html'
+
+    def get_object(self):
+        profile = get_object_or_404(Profile, user=self.request.user)
+        return profile

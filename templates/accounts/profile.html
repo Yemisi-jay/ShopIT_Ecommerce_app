@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Profile</h1>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Welcome, {{ object.user.username }}</h5>
+            <p class="card-text"><strong>Email:</strong> {{ object.user.email }}</p>
+            <p class="card-text"><strong>Phone Number:</strong> {{ object.phone_number|default:"N/A" }}</p>
+            <p class="card-text"><strong>Address:</strong> {{ object.address|default:"N/A" }}</p>
+            <p class="card-text"><strong>City:</strong> {{ object.city|default:"N/A" }}</p>
+            <p class="card-text"><strong>State:</strong> {{ object.state|default:"N/A" }}</p>
+            <p class="card-text"><strong>Country:</strong> {{ object.country|default:"N/A" }}</p>
+            <p class="card-text"><strong>Zip Code:</strong> {{ object.zip_code|default:"N/A" }}</p>
+
+            <a href="{% url 'profile_edit' %}" class="btn btn-primary">Edit Profile</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
