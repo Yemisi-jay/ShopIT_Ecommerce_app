@@ -77,7 +77,7 @@ class ProfileEditView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         form.save()
         messages.success(self.request, "Profile updated successfully")
-        return redirect('checkout')
+        return redirect('profile')
 
 
 class ProfileView(DetailView):
