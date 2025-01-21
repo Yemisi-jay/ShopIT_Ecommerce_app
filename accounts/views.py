@@ -1,39 +1,13 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.views.generic import TemplateView
 
-from .forms import CustomUserCreationForm, CustomAuthenticationForm
-from django.contrib.auth import authenticate, login, logout
+from .forms import CustomUserCreationForm, CustomAuthenticationForm, UserForm, ProfileForm
 from django.contrib.auth.views import LoginView, LogoutView
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, UpdateView
 from django.contrib import messages
 from django.urls import reverse_lazy
-
-
-# Create your views here.
-# def register(request):
-#     if request.method == 'POST':
-#         form = CustomUserCreationForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, f'Account created successfully for {form.cleaned_data["username"]}')
-#             return redirect('login')
-#         else:
-#             messages.error(request, 'Registration failed. Please check the form.')
-#     else:
-#         form = CustomUserCreationForm()
-#     return render(request, 'accounts/register.html', {"form": form})
-#
-#
-# def login_view(request):
-#     if request.method == 'POST':
-#         form = CustomAuthenticationForm(request, data=request.POST)
-#         if form.is_valid():
-#             user = form.get_user()
-#             login(request, user)
-#             return redirect('login')
-#         else:
-#             form = CustomAuthenticationForm()
-#         return render(request, 'accounts/login.html', {"form": form})
+from .models import Profile
 
 
 class RegisterView(FormView):
@@ -65,5 +39,38 @@ class CustomLoginView(LoginView):
         return reverse_lazy('product_list')
 
 
-# class HomeView(TemplateView):
-#     template_name = 'accounts/home.html'
+class UserInformationView(LoginRequiredMixin, TemplateView):
+    template_name = "user_info.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_form = CustomUserCreationForm(instance=self.request.user)
+        profile_form = ProfileForm(instance=self.request.user.profile)
+        context["user_form"] = user_form
+        context["profile_form"] = profile_form
+        return context
+
+    def post(self, request, *args, **kwargs):
+        user_form = CustomUserCreationForm(request.POST, instance=self.request.user)
+        profile_form = ProfileForm(request.POST, instance=request.user.profile)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(self.request, f"Account created successfully")
+            redirect('checkout')
+
+        else:
+            messages.error(self.request, "Please correct the error below.")
+            return self.render_to_response(self.get_context_data())
+
+class ProfileEditView(LoginRequiredMixin, UpdateView):
+    model = Profile
+    fields = ['address', 'phone_number']
+    template_name = 'edit_profile.html'
+
+    def get_object(self, queryset=None):
+        return self.request.user.profile
+
+    def get_success_url(self):
+        messages.success(self.request, "Profile updated successfully")

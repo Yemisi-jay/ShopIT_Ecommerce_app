@@ -50,18 +50,24 @@ class OrdersView(LoginRequiredMixin, View):
 
 
 class CheckoutView(LoginRequiredMixin, View):
-    def get(self, request):
-        if request.user.is_authenticated:
-            # Get or create user-based cart
-            cart, created = Cart.objects.get_or_create(user=request.user)
-        else:
-            # Get or create session-based cart
-            cart_id = request.session.get('cart_id')
-            if cart_id:
-                cart = Cart.objects.filter(id=cart_id).first()
-            else:
-                cart = None  # No cart for guests
+    def is_profile_complete(self, user):
+        """Check if the user's profile is complete."""
+        profile = getattr(user, 'profile', None)
+        required_fields = ['address', 'phone_number']
+        if not profile:
+            return False
+        for field in required_fields:
+            if not getattr(profile, field, None):
+                return False
+        return True
 
+    def get(self, request):
+        if not self.is_profile_complete(request.user):
+            messages.error(request, 'Please complete your profile before checking out.')
+            return redirect('profile_edit')
+
+            # Get or create user-based cart
+        cart, created = Cart.objects.get_or_create(user=request.user)
         if not cart or not cart.items.exists():
             messages.error(request, "Your cart is empty!")
             return redirect('cart_detail')
@@ -77,18 +83,14 @@ class CheckoutView(LoginRequiredMixin, View):
             'total_price': total_price,
             'form': form,
         }
-        print("Cart Items in CheckoutView Context:", cart_items)
-        print("Cart Items Passed to Templates:", cart_items)
-
         return render(request, 'orders/checkout.html', context)
 
     def post(self, request):
-        if request.user.is_authenticated:
-            cart = Cart.objects.filter(user=request.user).first()
-        else:
-            cart_id = request.session.get('cart_id')
-            cart = Cart.objects.filter(id=cart_id).first() if cart_id else None
+        if not self.is_profile_complete(request.user):
+            messages.error(request, 'Please complete your profile before checking out.')
+            return redirect('profile_edit')
 
+        cart = Cart.objects.filter(user=request.user).first()
         if not cart or not cart.items.exists():
             messages.error(request, "Your cart is empty!")
             return redirect('cart_detail')
