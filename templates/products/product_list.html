@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
     <h1 class="text-center">Welcome to ShopIT</h1>
     <p class="text-center">one stop app to get all your essentials</p>
@@ -11,6 +12,46 @@
     <button type="submit" class="btn btn-primary">Search</button>
 </div>
 </form>
+    
+{# Carousel#}
+    <div id="display" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#display" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#display" data-bs-slide-to="1" class="active"></button>   
+            <button type="button" data-bs-target="#display" data-bs-slide-to="2" class="active"></button>   
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="/media/products/red_canvas.jpg" alt="Red stiletto" class="d-block w-50 product-carousel-img" style="width: 50%">
+                <div class="carousel-caption">
+                    <h3>product</h3>
+                    <p>hot new deals available in stock</p>
+                </div>
+            </div>
+             <div class="carousel-item">
+                <img src="/media/products/pexels-kpaukshtite-1460838.jpg" alt="#" class="d-block w-50 product-carousel-img" style="width: 50%">
+                <div class="carousel-caption">
+                    <h3>product</h3>
+                    <p>hot new deals available in stock</p>
+                </div>
+            </div>
+             <div class="carousel-item">
+                <img src="/media/products/yellow_backpack.jpg" alt="#" class="d-block w-50 product-carousel-img" style="width: 50%">
+                <div class="carousel-caption">
+                    <h3>product</h3>
+                    <p>hot new deals available in stock</p>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#display" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#display" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+    
+    
     <div class="container">
         <div class="row">
             {% for product in products %}

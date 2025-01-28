@@ -1,5 +1,5 @@
 from rest_framework.routers import DefaultRouter
-from .views import ProductViewSet, CategoryViewSet, OrderViewSet, CartViewSet, UserViewSet
+from .views import ProductViewSet, CategoryViewSet, OrderViewSet, CartViewSet, UserViewSet, ProfileViewSet
 from django.urls import path, include
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -23,9 +23,9 @@ schema_view = get_schema_view(
 router = DefaultRouter()
 router.register('products', ProductViewSet, basename='products')
 router.register('categories', CategoryViewSet)
-router.register('profiles', ProductViewSet)
+router.register('profiles', ProfileViewSet)
 router.register('orders', OrderViewSet)
-router.register('cart', CartViewSet)
+router.register('carts', CartViewSet)
 router.register('users', UserViewSet)
 
 
